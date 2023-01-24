@@ -7,12 +7,12 @@ import java.util.UUID
 case class ClassRoom (
   classUuid: UUID,
   className: String,
-  isInSession: Boolean,
-  sessionStart: Option[Timestamp],
-  students: List[UUID],
-  isDeleted: Boolean,
+  isInSession: Boolean = false,
+  sessionStart: Option[Timestamp] = None,
+  students: List[UUID] = List.empty[UUID],
+  isDeleted: Boolean = false,
   createdAt: Timestamp,
-  updatedAt: Option[Timestamp]
+  updatedAt: Option[Timestamp] = None
 )
 
 object ClassRoom {
