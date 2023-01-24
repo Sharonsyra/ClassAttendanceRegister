@@ -2,7 +2,7 @@ package com.codedarasa.classroom.impl
 
 import akka.NotUsed
 import com.codedarasa.classroom.api.ClassRoomService
-import com.codedarasa.common.{ClassRoom, CreateClassRoom, Timestamp}
+import com.codedarasa.common.{ClassRoom, ClassRoomDetails, CreateClassRoom, Timestamp}
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 
 import java.time.Instant
@@ -13,14 +13,12 @@ import scala.concurrent.Future
 
 class ClassRoomServiceImpl extends ClassRoomService {
 
-  val classRooms: ArrayBuffer[ClassRoom] = ArrayBuffer.empty[ClassRoom]
-
   lazy val instantTimeNow: Instant = Instant.now()
-
   lazy val timeNow: Timestamp = Timestamp(
     seconds = instantTimeNow.getEpochSecond,
     nanos = instantTimeNow.getNano
   )
+  val classRooms: ArrayBuffer[ClassRoom] = ArrayBuffer.empty[ClassRoom]
 
   def classRoomNotFoundException(classRoomUuid: UUID) =
     throw new Exception(s"classRoom uuid $classRoomUuid does not exist")
@@ -52,7 +50,7 @@ class ClassRoomServiceImpl extends ClassRoomService {
       .match {
         case Some(classRoom) =>
           require(!classRoom.isDeleted, "class room is deleted")
-          require(!classRoom.isInSession, "class room is currently in session")
+          require(!classRoom.isInSession, "class room is in session")
           require(classRoom.students.isEmpty, "class room contains students")
 
           classRoom
@@ -70,9 +68,65 @@ class ClassRoomServiceImpl extends ClassRoomService {
     Future(deletedClassRoom)
   }
 
-  override def listClassRooms: ServiceCall[NotUsed, List[ClassRoom]] = ???
+  override def listClassRooms: ServiceCall[NotUsed, List[ClassRoomDetails]] = ServiceCall { _ =>
+    Future {
+      classRooms
+        .map { classRoom: ClassRoom =>
+          ClassRoomDetails(
+            className = classRoom.className,
+            isInSession = classRoom.isInSession,
+            numberOfStudents = classRoom.students.size
+          )
+        }
+        .toList
+    }
+  }
 
-  override def startClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ???
+  override def startClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ServiceCall { _ =>
+    val classRoomToStartSession = classRooms
+      .find(_.classUuid.equals(classRoomUuid))
+      .match {
+        case Some(classRoom) =>
+          require(!classRoom.isDeleted, "class room is deleted")
+          require(!classRoom.isInSession, "class room is in session")
+          require(classRoom.students.isEmpty, "class room contains students")
 
-  override def endClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ???
+          classRoom
+        case None => classRoomNotFoundException(classRoomUuid)
+      }
+
+    val classRoomWithStartedSession = classRoomToStartSession.copy(
+      isInSession = true
+    )
+
+    classRooms.-=(classRoomToStartSession)
+
+    classRooms.+=(classRoomWithStartedSession)
+
+    Future(classRoomWithStartedSession)
+
+  }
+
+  override def endClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ServiceCall { _ =>
+    val classRoomToEndSession: ClassRoom = classRooms
+      .find(_.classUuid.equals(classRoomUuid))
+      .match {
+        case Some(classRoom) =>
+          require(!classRoom.isDeleted, "class room is deleted")
+          require(classRoom.isInSession, "class room is not in session")
+
+          classRoom
+        case None => classRoomNotFoundException(classRoomUuid)
+      }
+
+    val classRoomWithEndedSession = classRoomToEndSession.copy(
+      isInSession = false
+    )
+
+    classRooms.-=(classRoomToEndSession)
+
+    classRooms.+=(classRoomWithEndedSession)
+
+    Future(classRoomWithEndedSession)
+  }
 }
