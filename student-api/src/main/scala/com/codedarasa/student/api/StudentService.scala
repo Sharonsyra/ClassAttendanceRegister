@@ -1,7 +1,7 @@
 package com.codedarasa.student.api
 
 import akka.NotUsed
-import com.codedarasa.common.{CreateStudent, Student}
+import com.codedarasa.common.{CreateStudent, Student, StudentDetails}
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
@@ -14,7 +14,7 @@ trait StudentService extends Service {
 
   def deleteStudent(studentUuid: UUID): ServiceCall[NotUsed, Student]
 
-  def listStudents: ServiceCall[NotUsed, Student]
+  def listStudents: ServiceCall[NotUsed, List[StudentDetails]]
 
   def checkInStudentIntoClass(studentUuid: UUID, classRoomUuid: UUID): ServiceCall[NotUsed, Student]
 
