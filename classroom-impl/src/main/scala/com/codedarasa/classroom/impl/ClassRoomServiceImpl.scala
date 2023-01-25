@@ -27,7 +27,7 @@ class ClassRoomServiceImpl extends ClassRoomService {
     val classRoomUuid: UUID = UUID.randomUUID()
 
     classRooms
-      .find(_.className.equals(request.className))
+      .find(_.className.toLowerCase.equals(request.className.toLowerCase))
       .match {
         case Some(_) => throw new Exception(s"classroom ${request.className} already exists")
         case None =>
@@ -58,7 +58,8 @@ class ClassRoomServiceImpl extends ClassRoomService {
       }
 
     val deletedClassRoom = classRoomToDelete.copy(
-      isDeleted = true
+      isDeleted = true,
+      updatedAt = Some(timeNow)
     )
 
     classRooms.-=(classRoomToDelete)
@@ -96,7 +97,8 @@ class ClassRoomServiceImpl extends ClassRoomService {
       }
 
     val classRoomWithStartedSession = classRoomToStartSession.copy(
-      isInSession = true
+      isInSession = true,
+      sessionStart = Some(timeNow)
     )
 
     classRooms.-=(classRoomToStartSession)
@@ -120,7 +122,8 @@ class ClassRoomServiceImpl extends ClassRoomService {
       }
 
     val classRoomWithEndedSession = classRoomToEndSession.copy(
-      isInSession = false
+      isInSession = false,
+      sessionStart = None
     )
 
     classRooms.-=(classRoomToEndSession)
