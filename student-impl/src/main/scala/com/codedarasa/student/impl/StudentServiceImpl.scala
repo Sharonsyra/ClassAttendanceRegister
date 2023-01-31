@@ -29,8 +29,7 @@ class StudentServiceImpl extends StudentService {
     val studentUuid: UUID = UUID.randomUUID()
 
     students
-      .find(_.studentName.toLowerCase.equals(s"${request.firstName} ${request.lastName}".toLowerCase))
-      .match {
+      .find(_.studentName.toLowerCase.equals(s"${request.firstName} ${request.lastName}".toLowerCase)) match {
         case Some(_) =>
           throw new Exception(s"student with name: ${request.firstName} ${request.lastName} already exists")
         case None =>
@@ -48,8 +47,7 @@ class StudentServiceImpl extends StudentService {
 
   override def deleteStudent(studentUuid: UUID): ServiceCall[NotUsed, Student] = ServiceCall { _ =>
     val studentToDelete = students
-      .find(_.studentUuid.equals(studentUuid))
-      .match {
+      .find(_.studentUuid.equals(studentUuid)) match {
         case Some(student) =>
           require(!student.isDeleted, "student is deleted")
           require(!student.isInClass, "student is in a class")
@@ -86,8 +84,7 @@ class StudentServiceImpl extends StudentService {
 
   override def checkInStudentIntoClass(studentUuid: UUID, classRoomUuid: UUID): ServiceCall[NotUsed, Student] = ServiceCall { _ =>
     val studentToCheckIn = students
-      .find(_.studentUuid.equals(studentUuid))
-      .match {
+      .find(_.studentUuid.equals(studentUuid)) match {
         case Some(student) =>
           require(!student.isDeleted, "student is deleted")
           require(!student.isInClass, "student is in a class")
@@ -112,15 +109,14 @@ class StudentServiceImpl extends StudentService {
   override def checkOutStudentFromClass(studentUuid: UUID, classRoomUuid: UUID): ServiceCall[NotUsed, Student] =
     ServiceCall { _ =>
       val studentToCheckOut = students
-        .find(_.studentUuid.equals(studentUuid))
-      .match {
-        case Some(student) =>
-          require(!student.isDeleted, "student is deleted")
-          require(student.isInClass, "student is not in a class")
+        .find(_.studentUuid.equals(studentUuid)) match {
+          case Some(student) =>
+            require(!student.isDeleted, "student is deleted")
+            require(student.isInClass, "student is not in a class")
 
-          student
-        case None => studentNotFoundException(studentUuid)
-      }
+            student
+          case None => studentNotFoundException(studentUuid)
+        }
 
       val checkedOutStudent = studentToCheckOut.copy(
         isInClass = false,

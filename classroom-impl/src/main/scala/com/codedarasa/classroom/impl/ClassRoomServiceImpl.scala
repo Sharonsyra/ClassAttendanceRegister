@@ -27,8 +27,7 @@ class ClassRoomServiceImpl extends ClassRoomService {
     val classRoomUuid: UUID = UUID.randomUUID()
 
     classRooms
-      .find(_.className.toLowerCase.equals(request.className.toLowerCase))
-      .match {
+      .find(_.className.toLowerCase.equals(request.className.toLowerCase)) match {
         case Some(_) => throw new Exception(s"classroom ${request.className} already exists")
         case None =>
           val newClassRoom = ClassRoom(
@@ -46,8 +45,7 @@ class ClassRoomServiceImpl extends ClassRoomService {
 
   override def deleteClassRoom(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ServiceCall { _ =>
     val classRoomToDelete = classRooms
-      .find(_.classUuid.equals(classRoomUuid))
-      .match {
+      .find(_.classUuid.equals(classRoomUuid)) match {
         case Some(classRoom) =>
           require(!classRoom.isDeleted, "class room is deleted")
           require(!classRoom.isInSession, "class room is in session")
@@ -85,8 +83,7 @@ class ClassRoomServiceImpl extends ClassRoomService {
 
   override def startClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ServiceCall { _ =>
     val classRoomToStartSession = classRooms
-      .find(_.classUuid.equals(classRoomUuid))
-      .match {
+      .find(_.classUuid.equals(classRoomUuid)) match {
         case Some(classRoom) =>
           require(!classRoom.isDeleted, "class room is deleted")
           require(!classRoom.isInSession, "class room is in session")
@@ -111,8 +108,7 @@ class ClassRoomServiceImpl extends ClassRoomService {
 
   override def endClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom] = ServiceCall { _ =>
     val classRoomToEndSession: ClassRoom = classRooms
-      .find(_.classUuid.equals(classRoomUuid))
-      .match {
+      .find(_.classUuid.equals(classRoomUuid)) match {
         case Some(classRoom) =>
           require(!classRoom.isDeleted, "class room is deleted")
           require(classRoom.isInSession, "class room is not in session")
