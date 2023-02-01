@@ -12,6 +12,14 @@ ThisBuild / libraryDependencySchemes +=
 lazy val macwire = "com.softwaremill.macwire" %% "macros" % "2.5.8" % "provided"
 lazy val scalatest = "org.scalatest" %% "scalatest" % "3.2.15" % Test
 
+lazy val root = (project in file("."))
+  .aggregate(
+    `classroom-api`,
+    `classroom-impl`,
+    `common`,
+    `student-api`,
+    `student-impl`
+  )
 
 lazy val `common` = (project in file("common"))
   .settings(
