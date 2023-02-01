@@ -8,10 +8,9 @@ import com.lightbend.lagom.scaladsl.api.ServiceCall
 import java.time.Instant
 import java.util.UUID
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class StudentServiceImpl extends StudentService {
+class StudentServiceImpl()(implicit ec: ExecutionContext) extends StudentService {
 
   lazy val instantTimeNow: Instant = Instant.now()
   lazy val timeNow: Timestamp = Timestamp(
