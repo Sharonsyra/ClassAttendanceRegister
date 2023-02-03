@@ -25,6 +25,10 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
   )
   val classRooms: ArrayBuffer[ClassRoom] = ArrayBuffer.empty[ClassRoom]
 
+  private val classRoomIsDeleted: String = "class room is deleted"
+  private val classRoomIsInSession: String = "class room is in session"
+  private val classRoomContainsStudents: String = "class room contains students"
+
   def classRoomNotFoundException(classRoomUuid: UUID) =
     throw new Exception(s"classRoom uuid $classRoomUuid does not exist")
 
@@ -45,7 +49,7 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
             createdAt = timeNow
           )
 
-          classRooms.+=(newClassRoom)
+          classRooms += newClassRoom
 
           Future(newClassRoom)
       }
@@ -59,9 +63,9 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
       val classRoomToDelete = classRooms
         .find(_.classUuid.equals(classRoomUuid)) match {
         case Some(classRoom) =>
-          require(!classRoom.isDeleted, "class room is deleted")
-          require(!classRoom.isInSession, "class room is in session")
-          require(classRoom.students.isEmpty, "class room contains students")
+          require(!classRoom.isDeleted, classRoomIsDeleted)
+          require(!classRoom.isInSession, classRoomIsInSession)
+          require(classRoom.students.isEmpty, classRoomContainsStudents)
 
           classRoom
         case None => classRoomNotFoundException(classRoomUuid)
@@ -72,9 +76,9 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
         updatedAt = Some(timeNow)
       )
 
-      classRooms.-=(classRoomToDelete)
+      classRooms -= classRoomToDelete
 
-      classRooms.+=(deletedClassRoom)
+      classRooms += deletedClassRoom
 
       Future(deletedClassRoom)
     }
@@ -99,9 +103,9 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
       val classRoomToStartSession = classRooms
         .find(_.classUuid.equals(classRoomUuid)) match {
         case Some(classRoom) =>
-          require(!classRoom.isDeleted, "class room is deleted")
-          require(!classRoom.isInSession, "class room is in session")
-          require(classRoom.students.isEmpty, "class room contains students")
+          require(!classRoom.isDeleted, classRoomIsDeleted)
+          require(!classRoom.isInSession, classRoomIsInSession)
+          require(classRoom.students.isEmpty, classRoomContainsStudents)
 
           classRoom
         case None => classRoomNotFoundException(classRoomUuid)
@@ -112,9 +116,9 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
         sessionStart = Some(timeNow)
       )
 
-      classRooms.-=(classRoomToStartSession)
+      classRooms -= classRoomToStartSession
 
-      classRooms.+=(classRoomWithStartedSession)
+      classRooms += classRoomWithStartedSession
 
       Future(classRoomWithStartedSession)
 
@@ -127,7 +131,7 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
       val classRoomToEndSession: ClassRoom = classRooms
         .find(_.classUuid.equals(classRoomUuid)) match {
         case Some(classRoom) =>
-          require(!classRoom.isDeleted, "class room is deleted")
+          require(!classRoom.isDeleted, classRoomIsDeleted)
           require(classRoom.isInSession, "class room is not in session")
 
           classRoom
@@ -139,9 +143,9 @@ class ClassRoomServiceImpl()(implicit ec: ExecutionContext)
         sessionStart = None
       )
 
-      classRooms.-=(classRoomToEndSession)
+      classRooms -= classRoomToEndSession
 
-      classRooms.+=(classRoomWithEndedSession)
+      classRooms += classRoomWithEndedSession
 
       Future(classRoomWithEndedSession)
     }

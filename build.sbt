@@ -12,11 +12,11 @@ ThisBuild / libraryDependencySchemes +=
 lazy val macwire = "com.softwaremill.macwire" %% "macros" % "2.5.8" % "provided"
 lazy val scalatest = "org.scalatest" %% "scalatest" % "3.2.15" % Test
 
-lazy val root = (project in file("."))
+lazy val ClassAttendanceRegister = (project in file("."))
   .aggregate(
+    `common`,
     `classroom-api`,
     `classroom-impl`,
-    `common`,
     `student-api`,
     `student-impl`
   )
@@ -42,6 +42,7 @@ lazy val `classroom-impl` = (project in file("classroom-impl"))
       scalatest
     )
   )
+  .settings(lagomForkedTestSettings)
   .dependsOn(`classroom-api`, `common`)
 
 // student
