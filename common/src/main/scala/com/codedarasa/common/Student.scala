@@ -7,11 +7,11 @@ import java.util.UUID
 case class Student (
   studentUuid: UUID,
   studentName: String,
-  isInClass: Boolean,
-  checkedInTime: Option[Timestamp],
-  isDeleted: Boolean,
+  isInClass: Boolean = false,
+  checkedInTime: Option[Timestamp] = None,
+  isDeleted: Boolean = false,
   createdAt: Timestamp,
-  updatedAt: Option[Timestamp]
+  updatedAt: Option[Timestamp] = None
 )
 
 object Student {

@@ -1,0 +1,27 @@
+- create classroom with valid arguments
+/// - reject create class room with duplicate uuid
+- reject create class room with duplicate name
+
+
+- delete valid classroom
+- reject delete classroom for non-existent classroom
+- reject delete classroom for deleted classroom
+- reject delete classroom for in session classroom
+- reject delete classroom with students
+
+
+- list classrooms successfully
+- return an empty list when there are no classrooms
+
+
+- start class room session successfully
+- reject start classroom session for non-existent classroom
+- reject start classroom session for deleted classroom
+- reject start classroom session for in session classroom
+- reject start classroom session with students
+
+
+- end class room session successfully
+- reject end classroom session for non-existent classroom
+- reject end classroom session for deleted classroom
+- reject end classroom session for not in session classroom

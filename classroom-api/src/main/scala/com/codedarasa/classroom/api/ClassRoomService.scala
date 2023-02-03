@@ -1,7 +1,7 @@
 package com.codedarasa.classroom.api
 
 import akka.NotUsed
-import com.codedarasa.common.{ClassRoom, CreateClassRoom}
+import com.codedarasa.common.{ClassRoom, ClassRoomDetails, CreateClassRoom}
 import com.lightbend.lagom.scaladsl.api.Service.{named, restCall}
 import com.lightbend.lagom.scaladsl.api.transport.Method
 import com.lightbend.lagom.scaladsl.api.{Descriptor, Service, ServiceCall}
@@ -14,7 +14,7 @@ trait ClassRoomService extends Service {
 
   def deleteClassRoom(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom]
 
-  def listClassRooms: ServiceCall[NotUsed, List[ClassRoom]]
+  def listClassRooms: ServiceCall[NotUsed, List[ClassRoomDetails]]
 
   def startClassRoomSession(classRoomUuid: UUID): ServiceCall[NotUsed, ClassRoom]
 
